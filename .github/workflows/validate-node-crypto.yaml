@@ -1,0 +1,34 @@
+name: Validate Node Crypto
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: [ ubuntu-latest ]
+
+    strategy:
+      matrix:
+        node-version: [ default, 16.x, 18.x, 20.x ]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        if: matrix.node-version != 'default'
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: node --version
+
+      - run: node crypto-available.js
+        continue-on-error: true
+
+      - run: node global-crypto.js
+        continue-on-error: true
+
+      - run: node require-crypto.js
+        continue-on-error: true
+
